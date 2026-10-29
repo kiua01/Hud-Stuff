@@ -7,7 +7,7 @@ import net.minecraft.client.player.LocalPlayer;
 
 /**
  * Client chat commands (intercepted, not sent to server):
- *   .hud | .wp set | .wp clear | .death clear | .hud help
+ *   .hud | .chunk | .wp set | .wp clear | .death clear | .hud help
  */
 public final class ClientCommands {
     private ClientCommands() {}
@@ -24,6 +24,12 @@ public final class ClientCommands {
             if (msg.equalsIgnoreCase(".hud") || msg.equalsIgnoreCase(".hud toggle")) {
                 HudConfig.toggle();
                 HudStuff.LOGGER.info("HUD {}", HudConfig.enabled ? "on" : "off");
+                return false;
+            }
+            if (msg.equalsIgnoreCase(".chunk") || msg.equalsIgnoreCase(".chunkborders")
+                    || msg.equalsIgnoreCase(".borders")) {
+                ChunkBorders.toggle();
+                HudStuff.LOGGER.info("Chunk borders {}", ChunkBorders.isEffectivelyOn() ? "ON" : "OFF");
                 return false;
             }
             if (msg.equalsIgnoreCase(".wp set") || msg.equalsIgnoreCase(".waypoint set")) {
@@ -43,7 +49,7 @@ public final class ClientCommands {
                 return false;
             }
             if (msg.equalsIgnoreCase(".hud help")) {
-                HudStuff.LOGGER.info(".hud | .wp set | .wp clear | .death clear");
+                HudStuff.LOGGER.info(".hud | .chunk | .wp set | .wp clear | .death clear");
                 return false;
             }
             return true;
