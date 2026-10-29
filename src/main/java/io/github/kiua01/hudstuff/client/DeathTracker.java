@@ -20,6 +20,7 @@ public final class DeathTracker {
                 String dim = client.level == null ? "" :
                     client.level.dimension().identifier().toString();
                 HudConfig.setDeath(player.getX(), player.getY(), player.getZ(), dim);
+                HudStuffClient.markDirty();
             }
             wasAlive = alive;
         });
