@@ -19,8 +19,10 @@ public final class DeathTracker {
 
             boolean alive = player.isAlive() && player.getHealth() > 0;
             if (wasAlive && !alive) {
-                String dim = client.level == null ? "" :
-                    client.level.dimension().location().toString();
+                String dim = "";
+                if (client.level != null) {
+                    dim = client.level.dimension().identifier().toString();
+                }
                 HudConfig.setDeath(player.getX(), player.getY(), player.getZ(), dim);
             }
             wasAlive = alive;
