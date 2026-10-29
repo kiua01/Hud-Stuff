@@ -8,6 +8,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.resources.Identifier;
 
 public final class HudStuffClient implements ClientModInitializer {
+    private static int saveCooldown = 0;
+    private static boolean dirty = false;
+
     @Override
     public void onInitializeClient() {
         HudElementRegistry.attachElementBefore(
@@ -20,11 +23,35 @@ public final class HudStuffClient implements ClientModInitializer {
         SpeedTracker.register();
         ClientCommands.register();
 
-        // Keep chunk borders forced on/off every tick (original stays visible while enabled)
-        ClientTickEvents.END_CLIENT_TICK.register(client -> ChunkBorders.tick());
+        // Load saved config once the client is up
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            ChunkBorders.tick();
 
-        // Enable borders by default like the Bedrock addon often does when the feature is on
-        // User can toggle with .chunk — start OFF so we don't surprise players
-        HudStuff.LOGGER.info("HUD Stuff ready — .chunk toggles borders (F3+G style), .hud help");
+            // First tick: load
+            if (client.player != null && !loadedOnce) {
+                ConfigIO.load();
+                loadedOnce = true;
+            }
+
+            // Debounced auto-save
+            if (dirty) {
+                saveCooldown++;
+                if (saveCooldown > 40) { // ~2 seconds
+                    ConfigIO.save();
+                    dirty = false;
+                    saveCooldown = 0;
+                }
+            }
+        });
+
+        HudStuff.LOGGER.info("HUD Stuff ready — config auto-saves to config/hudstuff.properties");
+    }
+
+    private static boolean loadedOnce = false;
+
+    /** Mark config dirty so it will be saved shortly. */
+    public static void markDirty() {
+        dirty = true;
+        saveCooldown = 0;
     }
 }
