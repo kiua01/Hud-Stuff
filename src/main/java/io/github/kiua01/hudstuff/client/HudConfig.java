@@ -34,6 +34,9 @@ public final class HudConfig {
     public static boolean showLookAt = true;
     public static boolean showCrop = true;
     public static boolean showRedstone = true;
+    public static boolean showBlockCount = true;
+    public static boolean showEntity = true;
+    public static boolean showHoney = true;
     public static boolean showMeasure = true;
     public static boolean showWaypoints = true;
 
