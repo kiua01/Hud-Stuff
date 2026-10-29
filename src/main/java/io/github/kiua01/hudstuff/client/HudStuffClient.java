@@ -2,7 +2,6 @@ package io.github.kiua01.hudstuff.client;
 
 import io.github.kiua01.hudstuff.HudStuff;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.resources.Identifier;
@@ -18,14 +17,7 @@ public final class HudStuffClient implements ClientModInitializer {
 
         DeathTracker.register();
 
-        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
-            ChunkBorderRenderer.render(
-                context.matrixStack(),
-                context.consumers(),
-                context.tickCounter().getGameTimeDeltaPartialTick(true)
-            );
-        });
-
-        HudStuff.LOGGER.info("HUD Stuff client ready — overlay + chunk borders + death waypoint");
+        // Chunk borders: use vanilla F3+G for now (stable across 26.3 render API churn).
+        HudStuff.LOGGER.info("HUD Stuff client ready — overlay + last-death waypoint (F3+G for chunk borders)");
     }
 }
