@@ -13,6 +13,10 @@ import java.lang.reflect.Method;
  */
 public final class ChunkBorders {
     private static Boolean forcedOn = null;
+    private static Object debugRendererCache;
+    private static Field borderFlagField;
+    private static Method borderToggleMethod;
+    private static boolean resolved;
 
     private ChunkBorders() {}
 
@@ -35,49 +39,85 @@ public final class ChunkBorders {
         if (forcedOn != null) apply();
     }
 
-    private static void apply() {
-        if (forcedOn == null) return;
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) return;
+    private static void resolve() {
+        if (resolved) return;
+        resolved = true;
         try {
-            Object debugRenderer = mc.debugRenderer;
-            if (debugRenderer == null) return;
-
-            for (String name : new String[]{"renderChunkborder", "chunkBorderRenderer", "renderChunkBorder"}) {
-                try {
-                    Field f = debugRenderer.getClass().getDeclaredField(name);
+            Minecraft mc = Minecraft.getInstance();
+            if (mc == null) return;
+            // Find debug renderer field on Minecraft
+            for (Field f : Minecraft.class.getDeclaredFields()) {
+                String n = f.getName().toLowerCase();
+                if (n.contains("debug") && n.contains("render")) {
                     f.setAccessible(true);
-                    if (f.getType() == boolean.class || f.getType() == Boolean.class) {
-                        f.set(debugRenderer, forcedOn);
-                        return;
-                    }
-                } catch (NoSuchFieldException ignored) {}
+                    debugRendererCache = f.get(mc);
+                    if (debugRendererCache != null) break;
+                }
             }
+            if (debugRendererCache == null) {
+                // try exact known names
+                for (String name : new String[]{"debugRenderer", "debugRenderers", "gameRenderer"}) {
+                    try {
+                        Field f = Minecraft.class.getDeclaredField(name);
+                        f.setAccessible(true);
+                        Object v = f.get(mc);
+                        if (v != null && v.getClass().getName().toLowerCase().contains("debug")) {
+                            debugRendererCache = v;
+                            break;
+                        }
+                    } catch (NoSuchFieldException ignored) {}
+                }
+            }
+            if (debugRendererCache == null) return;
 
-            for (String name : new String[]{"toggleRenderChunkBorder", "switchRenderChunkborder", "toggleChunkBorders"}) {
-                try {
-                    Method m = debugRenderer.getClass().getDeclaredMethod(name);
+            Class<?> cls = debugRendererCache.getClass();
+            for (Field f : cls.getDeclaredFields()) {
+                String n = f.getName().toLowerCase();
+                if ((n.contains("chunk") && n.contains("border")) || n.equals("renderchunkborder")) {
+                    if (f.getType() == boolean.class || f.getType() == Boolean.class) {
+                        f.setAccessible(true);
+                        borderFlagField = f;
+                        break;
+                    }
+                }
+            }
+            for (Method m : cls.getDeclaredMethods()) {
+                String n = m.getName().toLowerCase();
+                if (n.contains("chunk") && n.contains("border") && m.getParameterCount() == 0) {
                     m.setAccessible(true);
-                    if (readVanillaFlag() != forcedOn) m.invoke(debugRenderer);
-                    return;
-                } catch (NoSuchMethodException ignored) {}
+                    borderToggleMethod = m;
+                    break;
+                }
             }
         } catch (Throwable t) {
-            HudStuff.LOGGER.debug("Chunk border toggle failed: {}", t.toString());
+            HudStuff.LOGGER.debug("ChunkBorders resolve failed: {}", t.toString());
+        }
+    }
+
+    private static void apply() {
+        if (forcedOn == null) return;
+        resolve();
+        try {
+            if (borderFlagField != null && debugRendererCache != null) {
+                borderFlagField.set(debugRendererCache, forcedOn);
+                return;
+            }
+            if (borderToggleMethod != null && debugRendererCache != null) {
+                if (readVanillaFlag() != forcedOn) {
+                    borderToggleMethod.invoke(debugRendererCache);
+                }
+            }
+        } catch (Throwable t) {
+            HudStuff.LOGGER.debug("ChunkBorders apply failed: {}", t.toString());
         }
     }
 
     private static boolean readVanillaFlag() {
+        resolve();
         try {
-            Object debugRenderer = Minecraft.getInstance().debugRenderer;
-            if (debugRenderer == null) return false;
-            for (String name : new String[]{"renderChunkborder", "chunkBorderRenderer", "renderChunkBorder"}) {
-                try {
-                    Field f = debugRenderer.getClass().getDeclaredField(name);
-                    f.setAccessible(true);
-                    Object v = f.get(debugRenderer);
-                    if (v instanceof Boolean b) return b;
-                } catch (NoSuchFieldException ignored) {}
+            if (borderFlagField != null && debugRendererCache != null) {
+                Object v = borderFlagField.get(debugRendererCache);
+                if (v instanceof Boolean b) return b;
             }
         } catch (Throwable ignored) {}
         return false;
