@@ -7,7 +7,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Draws the main HUD lines on the client (26.3). */
 public final class HudOverlay {
     private HudOverlay() {}
 
@@ -35,14 +33,13 @@ public final class HudOverlay {
         int lineHeight = font.lineHeight + 1;
 
         for (String line : lines) {
-            // drawString(Font, String, int x, int y, int color, boolean shadow)
             graphics.text(font, line, x, y, HudConfig.color, true);
             y += lineHeight;
         }
     }
 
     private static List<String> buildLines(Minecraft mc, LocalPlayer player) {
-        List<String> lines = new ArrayList<>(8);
+        List<String> lines = new ArrayList<>(10);
         BlockPos pos = player.blockPosition();
 
         if (HudConfig.showCoords) {
@@ -62,9 +59,8 @@ public final class HudOverlay {
         if (HudConfig.showChunk) {
             int cx = pos.getX() >> 4;
             int cz = pos.getZ() >> 4;
-            int lx = pos.getX() & 15;
-            int lz = pos.getZ() & 15;
-            lines.add(String.format(Locale.ROOT, "Chunk: %d %d  (in: %d %d)", cx, cz, lx, lz));
+            lines.add(String.format(Locale.ROOT, "Chunk: %d %d  (in: %d %d)",
+                cx, cz, pos.getX() & 15, pos.getZ() & 15));
         }
 
         if (HudConfig.showBiome) {
@@ -91,6 +87,21 @@ public final class HudOverlay {
             int hours = (int) ((dayTime / 1000L + 6) % 24);
             int minutes = (int) ((dayTime % 1000L) * 60 / 1000L);
             lines.add(String.format(Locale.ROOT, "Day %d  %02d:%02d", day, hours, minutes));
+        }
+
+        if (HudConfig.showDeath && HudConfig.hasDeath) {
+            String currentDim = mc.level.dimension().location().toString();
+            if (currentDim.equals(HudConfig.deathDim)) {
+                double dx = HudConfig.deathX - player.getX();
+                double dy = HudConfig.deathY - player.getY();
+                double dz = HudConfig.deathZ - player.getZ();
+                double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                lines.add(String.format(Locale.ROOT, "Death: %.0f %.0f %.0f  (%.0fm)",
+                    HudConfig.deathX, HudConfig.deathY, HudConfig.deathZ, dist));
+            } else {
+                lines.add(String.format(Locale.ROOT, "Death: %.0f %.0f %.0f [%s]",
+                    HudConfig.deathX, HudConfig.deathY, HudConfig.deathZ, HudConfig.deathDim));
+            }
         }
 
         lines.add("FPS: " + mc.getFps());
