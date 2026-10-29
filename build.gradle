@@ -40,9 +40,3 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
     toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
-
-jar {
-    from('LICENSE') {
-        optional = true
-    }
-}
