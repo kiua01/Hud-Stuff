@@ -5,9 +5,6 @@ import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 
-/**
- * Client chat commands (not sent to server).
- */
 public final class ClientCommands {
     private ClientCommands() {}
 
@@ -27,7 +24,6 @@ public final class ClientCommands {
                 log("HUD " + (HudConfig.enabled ? "on" : "off"));
                 return false;
             }
-            // Per-feature toggles
             if (lower.equals(".hud crop")) { HudConfig.showCrop = !HudConfig.showCrop; log("crop " + on(HudConfig.showCrop)); return false; }
             if (lower.equals(".hud redstone") || lower.equals(".hud rs")) { HudConfig.showRedstone = !HudConfig.showRedstone; log("redstone " + on(HudConfig.showRedstone)); return false; }
             if (lower.equals(".hud look")) { HudConfig.showLookAt = !HudConfig.showLookAt; log("look-at " + on(HudConfig.showLookAt)); return false; }
@@ -36,6 +32,23 @@ public final class ClientCommands {
             if (lower.equals(".hud biome")) { HudConfig.showBiome = !HudConfig.showBiome; log("biome " + on(HudConfig.showBiome)); return false; }
             if (lower.equals(".hud slime")) { HudConfig.showSlime = !HudConfig.showSlime; log("slime " + on(HudConfig.showSlime)); return false; }
             if (lower.equals(".hud fps")) { HudConfig.showFps = !HudConfig.showFps; log("fps " + on(HudConfig.showFps)); return false; }
+            if (lower.equals(".hud count") || lower.equals(".hud blockcount")) { HudConfig.showBlockCount = !HudConfig.showBlockCount; log("block count " + on(HudConfig.showBlockCount)); return false; }
+            if (lower.equals(".hud entity") || lower.equals(".hud mob")) { HudConfig.showEntity = !HudConfig.showEntity; log("entity " + on(HudConfig.showEntity)); return false; }
+            if (lower.equals(".hud honey")) { HudConfig.showHoney = !HudConfig.showHoney; log("honey " + on(HudConfig.showHoney)); return false; }
+
+            if (lower.startsWith(".count radius ") || lower.startsWith(".count r ")) {
+                try {
+                    String num = lower.replace(".count radius ", "").replace(".count r ", "").trim();
+                    int r = Integer.parseInt(num);
+                    if (r < 1) r = 1;
+                    if (r > 32) r = 32;
+                    BlockCounter.radius = r;
+                    log("Block count radius = " + r);
+                } catch (NumberFormatException e) {
+                    log("Usage: .count radius <1-32>");
+                }
+                return false;
+            }
 
             if (lower.equals(".chunk") || lower.equals(".chunkborders") || lower.equals(".borders")) {
                 ChunkBorders.toggle();
@@ -104,8 +117,8 @@ public final class ClientCommands {
             }
 
             if (lower.equals(".hud help")) {
-                log(".hud [crop|redstone|look|armor|coords|biome|slime|fps]");
-                log(".chunk | .wp set/list/del/clear | .measure a/b/clear | .death clear");
+                log(".hud [crop|redstone|look|armor|coords|biome|slime|fps|count|entity|honey]");
+                log(".chunk | .count radius <n> | .wp set/list/del/clear | .measure a/b/clear | .death clear");
                 return false;
             }
             return true;
