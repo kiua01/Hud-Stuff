@@ -32,6 +32,8 @@ public final class HudConfig {
     public static boolean chunkBorders = false;
     public static boolean showSlime = true;
     public static boolean showLookAt = true;
+    public static boolean showCrop = true;
+    public static boolean showRedstone = true;
     public static boolean showMeasure = true;
     public static boolean showWaypoints = true;
 
