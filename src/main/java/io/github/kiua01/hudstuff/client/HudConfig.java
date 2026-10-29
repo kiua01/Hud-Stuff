@@ -29,6 +29,8 @@ public final class HudConfig {
     // Death / waypoints
     public static boolean showDeath = true;
     public static boolean showWaypoint = true;
+    public static boolean chunkBorders = false;
+    public static boolean showSlime = true;
 
     public static int color = 0xE0E0E0;
     public static int warnColor = 0xFF5555;
