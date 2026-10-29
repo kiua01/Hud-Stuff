@@ -2,48 +2,47 @@
 
 Java Fabric port of **HUD Essentials** (Bedrock addon by SandBlock Studios / Marketplace Trader) for Minecraft **26.3**.
 
-This is a **from-scratch Java rewrite**. Bedrock uses `@minecraft/server` scripts; Java uses Fabric client APIs. Features are reimplemented to match the original’s purpose.
+From-scratch rewrite: Bedrock scripts → Fabric client APIs.
 
-## Installed features (current build)
+## Features
 
-| Feature | Status | Notes |
-|--------|--------|-------|
-| XYZ / block coords | Done | |
-| Facing / yaw | Done | |
-| Chunk + local in-chunk | Done | |
-| Biome | Done | |
-| Light (block/sky) | Done | |
-| Day / clock | Done | |
-| Moon phase | Done | |
-| FPS | Done | |
-| Speed (b/s) | Done | |
-| Armor durability % | Done | H/C/L/F |
-| XP level + progress | Done | |
-| Held item + durability | Done | Warns when ≤15% |
-| Arrow count | Done | Arrow / spectral / tipped |
-| Inventory fullness warn | Done | Shows when ≥24/36 |
-| Last death coords + distance | Done | Auto on death |
-| Custom waypoint | Done | `.wp set` / `.wp clear` |
+| Feature | Status | How |
+|--------|--------|-----|
+| XYZ / block / facing / chunk | Done | Overlay |
+| Biome / light / day-clock / moon | Done | Overlay |
+| FPS / speed (b/s) | Done | Overlay |
+| Armor durability H/C/L/F % | Done | Overlay |
+| XP level + progress | Done | Overlay |
+| Held item + durability | Done | Overlay |
+| Arrow count | Done | Overlay |
+| Inventory fullness warn | Done | Overlay |
+| Last death + distance | Done | Auto on death |
+| **Chunk borders** (F3+G style) | Done | `.chunk` |
+| **Slime chunk** indicator | Done | Overlay (SP) |
+| **Look-at block** info | Done | Overlay |
+| **Distance measure** A→B | Done | `.measure a/b` |
+| **15 waypoints** | Done | `.wp set/list/del` |
 | Toggle HUD | Done | `.hud` |
-| Chunk borders | Vanilla | Use **F3+G** |
-| Settings UI screen | Planned | Chat toggles for now |
-| Multi-waypoint (15) UI | Planned | Single waypoint for now |
-| Crop info | Planned | |
+| Settings UI screen | Planned | |
+| Crop / farmland info | Planned | |
 | Dynamic light | Planned | |
-| Distance measure tool | Planned | |
-| Shape pattern tools | Planned | |
-| Block counter tool | Planned | |
-| Redstone / honey / mob info | Planned | |
-| Starting book / lore UI | Planned | |
+| Shape / block counter tools | Planned | |
+| Redstone / honey / mob lines | Planned | |
 
 ## Commands (client chat — not sent to server)
 
 ```
-.hud              toggle overlay
-.hud help         list commands
-.wp set           set waypoint at your feet
-.wp clear         clear waypoint
-.death clear      clear death marker
+.hud                  toggle overlay
+.hud help             list commands
+.chunk                toggle chunk borders (same wireframe as F3+G)
+.wp set [name]        add waypoint at feet (max 15)
+.wp list              list waypoints
+.wp del <n>           delete waypoint number n
+.wp clear             clear all waypoints
+.measure a            set measure point A
+.measure b            set measure point B
+.measure clear        clear measure
+.death clear          clear death marker
 ```
 
 ## Install
@@ -51,7 +50,7 @@ This is a **from-scratch Java rewrite**. Bedrock uses `@minecraft/server` script
 1. Minecraft **26.3**
 2. Fabric Loader **≥ 0.19.5**
 3. Fabric API **0.165.0+26.3**
-4. Drop the jar from Actions into `mods/`
+4. Jar from Actions → `mods/`
 
 ## Build
 
