@@ -1,9 +1,9 @@
 package io.github.kiua01.hudstuff.client;
 
+import io.github.kiua01.hudstuff.HudStuff;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
 
 /**
  * Client chat commands (intercepted, not sent to server):
@@ -23,34 +23,30 @@ public final class ClientCommands {
 
             if (msg.equalsIgnoreCase(".hud") || msg.equalsIgnoreCase(".hud toggle")) {
                 HudConfig.toggle();
-                tip(HudConfig.enabled ? "HUD on" : "HUD off");
+                HudStuff.LOGGER.info("HUD {}", HudConfig.enabled ? "on" : "off");
                 return false;
             }
             if (msg.equalsIgnoreCase(".wp set") || msg.equalsIgnoreCase(".waypoint set")) {
                 String dim = mc.level == null ? "" : mc.level.dimension().identifier().toString();
                 HudConfig.setWaypoint(player.getX(), player.getY(), player.getZ(), dim, "Waypoint");
-                tip(String.format("Waypoint set at %.0f %.0f %.0f", player.getX(), player.getY(), player.getZ()));
+                HudStuff.LOGGER.info("Waypoint set at {}, {}, {}", player.getX(), player.getY(), player.getZ());
                 return false;
             }
             if (msg.equalsIgnoreCase(".wp clear") || msg.equalsIgnoreCase(".waypoint clear")) {
                 HudConfig.clearWaypoint();
-                tip("Waypoint cleared");
+                HudStuff.LOGGER.info("Waypoint cleared");
                 return false;
             }
             if (msg.equalsIgnoreCase(".death clear")) {
                 HudConfig.clearDeath();
-                tip("Death marker cleared");
+                HudStuff.LOGGER.info("Death marker cleared");
                 return false;
             }
             if (msg.equalsIgnoreCase(".hud help")) {
-                tip(".hud | .wp set | .wp clear | .death clear");
+                HudStuff.LOGGER.info(".hud | .wp set | .wp clear | .death clear");
                 return false;
             }
             return true;
         });
-    }
-
-    private static void tip(String text) {
-        Minecraft.getInstance().gui.getChat().addMessage(Component.literal("[HUD] " + text));
     }
 }
