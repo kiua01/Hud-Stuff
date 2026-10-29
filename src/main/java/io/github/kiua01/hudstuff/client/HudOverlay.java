@@ -192,6 +192,21 @@ public final class HudOverlay {
             }
         }
 
+        if (HudConfig.showHoney) {
+            String honey = HoneyInfo.line(mc);
+            if (honey != null) lines.add(new Line(honey, c));
+        }
+
+        if (HudConfig.showBlockCount) {
+            String cnt = BlockCounter.line(mc);
+            if (cnt != null) lines.add(new Line(cnt, c));
+        }
+
+        if (HudConfig.showEntity) {
+            String ent = EntityInfo.line(mc, player);
+            if (ent != null) lines.add(new Line(ent, c));
+        }
+
         if (HudConfig.showMeasure && (DistanceMeasure.hasA || DistanceMeasure.hasB)) {
             lines.add(new Line(DistanceMeasure.line(), c));
         }
