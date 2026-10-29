@@ -7,12 +7,6 @@ import net.minecraft.client.player.LocalPlayer;
 
 /**
  * Client chat commands (not sent to server).
- *
- *   .hud / .hud help
- *   .chunk
- *   .wp set [name] | .wp list | .wp del <n> | .wp clear
- *   .measure a | .measure b | .measure clear
- *   .death clear
  */
 public final class ClientCommands {
     private ClientCommands() {}
@@ -30,86 +24,94 @@ public final class ClientCommands {
 
             if (lower.equals(".hud") || lower.equals(".hud toggle")) {
                 HudConfig.toggle();
-                HudStuff.LOGGER.info("HUD {}", HudConfig.enabled ? "on" : "off");
+                log("HUD " + (HudConfig.enabled ? "on" : "off"));
                 return false;
             }
+            // Per-feature toggles
+            if (lower.equals(".hud crop")) { HudConfig.showCrop = !HudConfig.showCrop; log("crop " + on(HudConfig.showCrop)); return false; }
+            if (lower.equals(".hud redstone") || lower.equals(".hud rs")) { HudConfig.showRedstone = !HudConfig.showRedstone; log("redstone " + on(HudConfig.showRedstone)); return false; }
+            if (lower.equals(".hud look")) { HudConfig.showLookAt = !HudConfig.showLookAt; log("look-at " + on(HudConfig.showLookAt)); return false; }
+            if (lower.equals(".hud armor")) { HudConfig.showArmor = !HudConfig.showArmor; log("armor " + on(HudConfig.showArmor)); return false; }
+            if (lower.equals(".hud coords")) { HudConfig.showCoords = !HudConfig.showCoords; log("coords " + on(HudConfig.showCoords)); return false; }
+            if (lower.equals(".hud biome")) { HudConfig.showBiome = !HudConfig.showBiome; log("biome " + on(HudConfig.showBiome)); return false; }
+            if (lower.equals(".hud slime")) { HudConfig.showSlime = !HudConfig.showSlime; log("slime " + on(HudConfig.showSlime)); return false; }
+            if (lower.equals(".hud fps")) { HudConfig.showFps = !HudConfig.showFps; log("fps " + on(HudConfig.showFps)); return false; }
+
             if (lower.equals(".chunk") || lower.equals(".chunkborders") || lower.equals(".borders")) {
                 ChunkBorders.toggle();
-                HudStuff.LOGGER.info("Chunk borders {}", ChunkBorders.isEffectivelyOn() ? "ON" : "OFF");
+                log("Chunk borders " + (ChunkBorders.isEffectivelyOn() ? "ON" : "OFF"));
                 return false;
             }
             if (lower.equals(".death clear")) {
                 HudConfig.clearDeath();
-                HudStuff.LOGGER.info("Death marker cleared");
+                log("Death marker cleared");
                 return false;
             }
 
-            // Waypoints
             if (lower.equals(".wp set") || lower.startsWith(".wp set ")) {
                 String name = "WP" + (Waypoints.size() + 1);
                 if (msg.length() > 8) name = msg.substring(8).trim();
                 if (name.isEmpty()) name = "WP" + (Waypoints.size() + 1);
                 if (Waypoints.add(name, player.getX(), player.getY(), player.getZ(), dim)) {
-                    HudStuff.LOGGER.info("Waypoint {} saved ({}/{})", name, Waypoints.size(), Waypoints.MAX);
+                    log("Waypoint " + name + " saved (" + Waypoints.size() + "/" + Waypoints.MAX + ")");
                 } else {
-                    HudStuff.LOGGER.info("Waypoint list full (max {})", Waypoints.MAX);
+                    log("Waypoint list full (max " + Waypoints.MAX + ")");
                 }
                 return false;
             }
             if (lower.equals(".wp list")) {
-                if (Waypoints.size() == 0) {
-                    HudStuff.LOGGER.info("No waypoints");
-                } else {
+                if (Waypoints.size() == 0) log("No waypoints");
+                else {
                     int i = 1;
-                    for (Waypoints.Entry e : Waypoints.all()) {
-                        HudStuff.LOGGER.info("{}. {}", i++, e);
-                    }
+                    for (Waypoints.Entry e : Waypoints.all()) log(i++ + ". " + e);
                 }
                 return false;
             }
             if (lower.startsWith(".wp del ")) {
                 try {
                     int n = Integer.parseInt(msg.substring(8).trim());
-                    if (Waypoints.remove(n)) HudStuff.LOGGER.info("Removed WP{}", n);
-                    else HudStuff.LOGGER.info("No WP{}", n);
+                    log(Waypoints.remove(n) ? "Removed WP" + n : "No WP" + n);
                 } catch (NumberFormatException e) {
-                    HudStuff.LOGGER.info("Usage: .wp del <number>");
+                    log("Usage: .wp del <number>");
                 }
                 return false;
             }
             if (lower.equals(".wp clear")) {
                 Waypoints.clear();
                 HudConfig.clearWaypoint();
-                HudStuff.LOGGER.info("All waypoints cleared");
+                log("All waypoints cleared");
                 return false;
             }
 
-            // Distance measure
             if (lower.equals(".measure a") || lower.equals(".measurea")) {
                 DistanceMeasure.setA(player.getX(), player.getY(), player.getZ());
-                HudStuff.LOGGER.info("Measure point A set");
+                log("Measure point A set");
                 return false;
             }
             if (lower.equals(".measure b") || lower.equals(".measureb")) {
                 DistanceMeasure.setB(player.getX(), player.getY(), player.getZ());
-                HudStuff.LOGGER.info("Measure point B set");
+                log("Measure point B set");
                 return false;
             }
-            if (lower.equals(".measure clear") || lower.equals(".measure")) {
-                if (lower.equals(".measure")) {
-                    HudStuff.LOGGER.info(".measure a | .measure b | .measure clear");
-                } else {
-                    DistanceMeasure.clear();
-                    HudStuff.LOGGER.info("Measure cleared");
-                }
+            if (lower.equals(".measure clear")) {
+                DistanceMeasure.clear();
+                log("Measure cleared");
+                return false;
+            }
+            if (lower.equals(".measure")) {
+                log(".measure a | .measure b | .measure clear");
                 return false;
             }
 
             if (lower.equals(".hud help")) {
-                HudStuff.LOGGER.info(".hud | .chunk | .wp set/list/del/clear | .measure a/b/clear | .death clear");
+                log(".hud [crop|redstone|look|armor|coords|biome|slime|fps]");
+                log(".chunk | .wp set/list/del/clear | .measure a/b/clear | .death clear");
                 return false;
             }
             return true;
         });
     }
+
+    private static String on(boolean b) { return b ? "ON" : "OFF"; }
+    private static void log(String s) { HudStuff.LOGGER.info(s); }
 }
