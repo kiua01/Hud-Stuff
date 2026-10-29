@@ -90,7 +90,7 @@ public final class HudOverlay {
         }
 
         if (HudConfig.showDeath && HudConfig.hasDeath) {
-            String currentDim = mc.level.dimension().location().toString();
+            String currentDim = mc.level.dimension().identifier().toString();
             if (currentDim.equals(HudConfig.deathDim)) {
                 double dx = HudConfig.deathX - player.getX();
                 double dy = HudConfig.deathY - player.getY();
