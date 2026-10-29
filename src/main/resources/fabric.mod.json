@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "hudstuff",
+  "version": "${version}",
+  "name": "HUD Stuff",
+  "description": "Java Fabric port of HUD Essentials for Minecraft 26.3 — coordinates, light, biome, chunk borders, death waypoint and more.",
+  "authors": ["kiua01", "port from SandBlock Studios Bedrock addon"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["io.github.kiua01.hudstuff.HudStuff"],
+    "client": ["io.github.kiua01.hudstuff.client.HudStuffClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "fabric-api": ">=0.165.0",
+    "minecraft": "${minecraft_version}",
+    "java": ">=25"
+  }
+}
