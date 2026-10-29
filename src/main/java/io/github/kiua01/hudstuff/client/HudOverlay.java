@@ -78,6 +78,15 @@ public final class HudOverlay {
                 pos.getX() >> 4, pos.getZ() >> 4, pos.getX() & 15, pos.getZ() & 15), c));
         }
 
+        if (HudConfig.showSlime) {
+            boolean slime = SlimeChunks.isSlimeChunk(player, mc.level);
+            lines.add(new Line(slime ? "Slime chunk: YES" : "Slime chunk: no", slime ? c : c));
+        }
+
+        if (HudConfig.chunkBorders || ChunkBorders.isEffectivelyOn()) {
+            lines.add(new Line("Chunk borders: ON  (.chunk to toggle)", c));
+        }
+
         if (HudConfig.showBiome) {
             Holder<Biome> biome = mc.level.getBiome(pos);
             String biomeId = "unknown";
