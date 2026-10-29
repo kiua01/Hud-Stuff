@@ -14,19 +14,17 @@ import net.minecraft.world.level.biome.Biome;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 /** Draws the main HUD lines on the client (26.3). */
 public final class HudOverlay {
     private HudOverlay() {}
 
-    public static void render(GuiGraphicsExtractor graphics, float tickDelta) {
+    public static void render(GuiGraphicsExtractor graphics) {
         if (!HudConfig.enabled) return;
 
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.level == null) return;
-        if (mc.options.hideGui) return;
         if (mc.getDebugOverlay().showDebugScreen()) return;
 
         Font font = mc.font;
@@ -37,6 +35,7 @@ public final class HudOverlay {
         int lineHeight = font.lineHeight + 1;
 
         for (String line : lines) {
+            // drawString(Font, String, int x, int y, int color, boolean shadow)
             graphics.drawString(font, line, x, y, HudConfig.color, true);
             y += lineHeight;
         }
@@ -70,10 +69,11 @@ public final class HudOverlay {
 
         if (HudConfig.showBiome) {
             Holder<Biome> biome = mc.level.getBiome(pos);
-            String biomeId = biome.unwrapKey()
-                .map(ResourceKey::location)
-                .map(Object::toString)
-                .orElse("unknown");
+            String biomeId = "unknown";
+            var key = biome.unwrapKey();
+            if (key.isPresent()) {
+                biomeId = key.get().identifier().toString();
+            }
             lines.add("Biome: " + biomeId);
         }
 
@@ -85,8 +85,9 @@ public final class HudOverlay {
         }
 
         if (HudConfig.showTime) {
-            long dayTime = mc.level.getDayTime() % 24000L;
-            long day = mc.level.getDayTime() / 24000L;
+            long gameTime = mc.level.getGameTime();
+            long dayTime = gameTime % 24000L;
+            long day = gameTime / 24000L;
             int hours = (int) ((dayTime / 1000L + 6) % 24);
             int minutes = (int) ((dayTime % 1000L) * 60 / 1000L);
             lines.add(String.format(Locale.ROOT, "Day %d  %02d:%02d", day, hours, minutes));
