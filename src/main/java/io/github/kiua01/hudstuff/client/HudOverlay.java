@@ -186,6 +186,30 @@ public final class HudOverlay {
                 HudConfig.wpDim, player, mc, c));
         }
 
+        if (HudConfig.showLookAt) {
+            String look = LookAtInfo.line(mc, player);
+            if (look != null) lines.add(new Line(look, c));
+        }
+
+        if (HudConfig.showMeasure && (DistanceMeasure.hasA || DistanceMeasure.hasB)) {
+            lines.add(new Line(DistanceMeasure.line(), c));
+        }
+
+        if (HudConfig.showWaypoints) {
+            for (int i = 0; i < Waypoints.size(); i++) {
+                Waypoints.Entry e = Waypoints.all().get(i);
+                String currentDim = mc.level.dimension().identifier().toString();
+                if (currentDim.equals(e.dim)) {
+                    double d = e.distanceTo(player.getX(), player.getY(), player.getZ());
+                    lines.add(new Line(String.format(java.util.Locale.ROOT, "WP%d %s: %.0f %.0f %.0f (%.0fm)",
+                        i + 1, e.name, e.x, e.y, e.z, d), c));
+                } else {
+                    lines.add(new Line(String.format(java.util.Locale.ROOT, "WP%d %s: %.0f %.0f %.0f [%s]",
+                        i + 1, e.name, e.x, e.y, e.z, e.dim), c));
+                }
+            }
+        }
+
         if (HudConfig.showFps) {
             lines.add(new Line("FPS: " + mc.getFps(), c));
         }
