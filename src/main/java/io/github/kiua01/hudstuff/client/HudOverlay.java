@@ -36,7 +36,7 @@ public final class HudOverlay {
 
         for (String line : lines) {
             // drawString(Font, String, int x, int y, int color, boolean shadow)
-            graphics.drawString(font, line, x, y, HudConfig.color, true);
+            graphics.text(font, line, x, y, HudConfig.color, true);
             y += lineHeight;
         }
     }
