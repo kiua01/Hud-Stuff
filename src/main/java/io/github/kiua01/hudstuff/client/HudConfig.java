@@ -31,6 +31,9 @@ public final class HudConfig {
     public static boolean showWaypoint = true;
     public static boolean chunkBorders = false;
     public static boolean showSlime = true;
+    public static boolean showLookAt = true;
+    public static boolean showMeasure = true;
+    public static boolean showWaypoints = true;
 
     public static int color = 0xE0E0E0;
     public static int warnColor = 0xFF5555;
