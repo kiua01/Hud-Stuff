@@ -4,26 +4,34 @@ import io.github.kiua01.hudstuff.HudStuff;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.resources.Identifier;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public final class HudStuffClient implements ClientModInitializer {
     private static KeyMapping toggleKey;
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
+        Identifier.fromNamespaceAndPath(HudStuff.MOD_ID, "main")
+    );
 
     @Override
     public void onInitializeClient() {
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        toggleKey = KeyBindingHelper.registerKeyMapping(new KeyMapping(
             "key.hudstuff.toggle",
-            GLFW.GLFW_KEY_H,
-            "key.hudstuff.category"
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_H,
+            CATEGORY
         ));
 
-        HudRenderCallback.EVENT.register((graphics, tickCounter) -> {
-            HudOverlay.render(graphics, tickCounter.getGameTimeDeltaPartialTick(true));
-        });
+        HudElementRegistry.attachElementBefore(
+            VanillaHudElements.CHAT,
+            Identifier.fromNamespaceAndPath(HudStuff.MOD_ID, "overlay"),
+            (graphics, deltaTracker) -> HudOverlay.render(graphics, deltaTracker.getGameTimeDeltaPartialTick(true))
+        );
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleKey.consumeClick()) {
