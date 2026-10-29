@@ -2,30 +2,32 @@ package io.github.kiua01.hudstuff.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
-/** Draws the main HUD lines on the client. */
+/** Draws the main HUD lines on the client (26.3). */
 public final class HudOverlay {
     private HudOverlay() {}
 
-    public static void render(GuiGraphics graphics, float tickDelta) {
+    public static void render(GuiGraphicsExtractor graphics, float tickDelta) {
         if (!HudConfig.enabled) return;
 
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || mc.level == null || mc.options.hideGui) return;
-        if (mc.getDebugOverlay().showDebugScreen()) return; // don't fight F3
+        if (player == null || mc.level == null) return;
+        if (mc.options.hideGui) return;
+        if (mc.getDebugOverlay().showDebugScreen()) return;
 
         Font font = mc.font;
         List<String> lines = buildLines(mc, player);
@@ -69,16 +71,15 @@ public final class HudOverlay {
         if (HudConfig.showBiome) {
             Holder<Biome> biome = mc.level.getBiome(pos);
             String biomeId = biome.unwrapKey()
-                .map(k -> k.location().toString())
+                .map(ResourceKey::location)
+                .map(Object::toString)
                 .orElse("unknown");
             lines.add("Biome: " + biomeId);
         }
 
         if (HudConfig.showLight) {
-            int blockLight = mc.level.getBrightness(
-                net.minecraft.world.level.LightLayer.BLOCK, pos);
-            int skyLight = mc.level.getBrightness(
-                net.minecraft.world.level.LightLayer.SKY, pos);
+            int blockLight = mc.level.getBrightness(LightLayer.BLOCK, pos);
+            int skyLight = mc.level.getBrightness(LightLayer.SKY, pos);
             lines.add(String.format(Locale.ROOT, "Light: %d  (block %d / sky %d)",
                 Math.max(blockLight, skyLight), blockLight, skyLight));
         }
@@ -91,9 +92,7 @@ public final class HudOverlay {
             lines.add(String.format(Locale.ROOT, "Day %d  %02d:%02d", day, hours, minutes));
         }
 
-        // FPS (from Minecraft's counter when available)
         lines.add("FPS: " + mc.getFps());
-
         return lines;
     }
 }
