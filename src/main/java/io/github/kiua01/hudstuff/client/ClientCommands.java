@@ -21,20 +21,20 @@ public final class ClientCommands {
 
             if (lower.equals(".hud") || lower.equals(".hud toggle")) {
                 HudConfig.toggle();
-                log("HUD " + (HudConfig.enabled ? "on" : "off"));
+                changed("HUD " + (HudConfig.enabled ? "on" : "off"));
                 return false;
             }
-            if (lower.equals(".hud crop")) { HudConfig.showCrop = !HudConfig.showCrop; log("crop " + on(HudConfig.showCrop)); return false; }
-            if (lower.equals(".hud redstone") || lower.equals(".hud rs")) { HudConfig.showRedstone = !HudConfig.showRedstone; log("redstone " + on(HudConfig.showRedstone)); return false; }
-            if (lower.equals(".hud look")) { HudConfig.showLookAt = !HudConfig.showLookAt; log("look-at " + on(HudConfig.showLookAt)); return false; }
-            if (lower.equals(".hud armor")) { HudConfig.showArmor = !HudConfig.showArmor; log("armor " + on(HudConfig.showArmor)); return false; }
-            if (lower.equals(".hud coords")) { HudConfig.showCoords = !HudConfig.showCoords; log("coords " + on(HudConfig.showCoords)); return false; }
-            if (lower.equals(".hud biome")) { HudConfig.showBiome = !HudConfig.showBiome; log("biome " + on(HudConfig.showBiome)); return false; }
-            if (lower.equals(".hud slime")) { HudConfig.showSlime = !HudConfig.showSlime; log("slime " + on(HudConfig.showSlime)); return false; }
-            if (lower.equals(".hud fps")) { HudConfig.showFps = !HudConfig.showFps; log("fps " + on(HudConfig.showFps)); return false; }
-            if (lower.equals(".hud count") || lower.equals(".hud blockcount")) { HudConfig.showBlockCount = !HudConfig.showBlockCount; log("block count " + on(HudConfig.showBlockCount)); return false; }
-            if (lower.equals(".hud entity") || lower.equals(".hud mob")) { HudConfig.showEntity = !HudConfig.showEntity; log("entity " + on(HudConfig.showEntity)); return false; }
-            if (lower.equals(".hud honey")) { HudConfig.showHoney = !HudConfig.showHoney; log("honey " + on(HudConfig.showHoney)); return false; }
+            if (lower.equals(".hud crop")) { HudConfig.showCrop = !HudConfig.showCrop; changed("crop " + on(HudConfig.showCrop)); return false; }
+            if (lower.equals(".hud redstone") || lower.equals(".hud rs")) { HudConfig.showRedstone = !HudConfig.showRedstone; changed("redstone " + on(HudConfig.showRedstone)); return false; }
+            if (lower.equals(".hud look")) { HudConfig.showLookAt = !HudConfig.showLookAt; changed("look-at " + on(HudConfig.showLookAt)); return false; }
+            if (lower.equals(".hud armor")) { HudConfig.showArmor = !HudConfig.showArmor; changed("armor " + on(HudConfig.showArmor)); return false; }
+            if (lower.equals(".hud coords")) { HudConfig.showCoords = !HudConfig.showCoords; changed("coords " + on(HudConfig.showCoords)); return false; }
+            if (lower.equals(".hud biome")) { HudConfig.showBiome = !HudConfig.showBiome; changed("biome " + on(HudConfig.showBiome)); return false; }
+            if (lower.equals(".hud slime")) { HudConfig.showSlime = !HudConfig.showSlime; changed("slime " + on(HudConfig.showSlime)); return false; }
+            if (lower.equals(".hud fps")) { HudConfig.showFps = !HudConfig.showFps; changed("fps " + on(HudConfig.showFps)); return false; }
+            if (lower.equals(".hud count") || lower.equals(".hud blockcount")) { HudConfig.showBlockCount = !HudConfig.showBlockCount; changed("block count " + on(HudConfig.showBlockCount)); return false; }
+            if (lower.equals(".hud entity") || lower.equals(".hud mob")) { HudConfig.showEntity = !HudConfig.showEntity; changed("entity " + on(HudConfig.showEntity)); return false; }
+            if (lower.equals(".hud honey")) { HudConfig.showHoney = !HudConfig.showHoney; changed("honey " + on(HudConfig.showHoney)); return false; }
 
             if (lower.startsWith(".count radius ") || lower.startsWith(".count r ")) {
                 try {
@@ -43,7 +43,7 @@ public final class ClientCommands {
                     if (r < 1) r = 1;
                     if (r > 32) r = 32;
                     BlockCounter.radius = r;
-                    log("Block count radius = " + r);
+                    changed("Block count radius = " + r);
                 } catch (NumberFormatException e) {
                     log("Usage: .count radius <1-32>");
                 }
@@ -52,12 +52,12 @@ public final class ClientCommands {
 
             if (lower.equals(".chunk") || lower.equals(".chunkborders") || lower.equals(".borders")) {
                 ChunkBorders.toggle();
-                log("Chunk borders " + (ChunkBorders.isEffectivelyOn() ? "ON" : "OFF"));
+                changed("Chunk borders " + (ChunkBorders.isEffectivelyOn() ? "ON" : "OFF"));
                 return false;
             }
             if (lower.equals(".death clear")) {
                 HudConfig.clearDeath();
-                log("Death marker cleared");
+                changed("Death marker cleared");
                 return false;
             }
 
@@ -66,9 +66,9 @@ public final class ClientCommands {
                 if (msg.length() > 8) name = msg.substring(8).trim();
                 if (name.isEmpty()) name = "WP" + (Waypoints.size() + 1);
                 if (Waypoints.add(name, player.getX(), player.getY(), player.getZ(), dim)) {
-                    log("Waypoint " + name + " saved (" + Waypoints.size() + "/" + Waypoints.MAX + ")");
+                    changed("Waypoint " + name + " saved (" + Waypoints.size() + "/" + Waypoints.MAX + ")");
                 } else {
-                    log("Waypoint list full (max " + Waypoints.MAX + ")");
+                    changed("Waypoint list full (max " + Waypoints.MAX + ")");
                 }
                 return false;
             }
@@ -92,23 +92,23 @@ public final class ClientCommands {
             if (lower.equals(".wp clear")) {
                 Waypoints.clear();
                 HudConfig.clearWaypoint();
-                log("All waypoints cleared");
+                changed("All waypoints cleared");
                 return false;
             }
 
             if (lower.equals(".measure a") || lower.equals(".measurea")) {
                 DistanceMeasure.setA(player.getX(), player.getY(), player.getZ());
-                log("Measure point A set");
+                changed("Measure point A set");
                 return false;
             }
             if (lower.equals(".measure b") || lower.equals(".measureb")) {
                 DistanceMeasure.setB(player.getX(), player.getY(), player.getZ());
-                log("Measure point B set");
+                changed("Measure point B set");
                 return false;
             }
             if (lower.equals(".measure clear")) {
                 DistanceMeasure.clear();
-                log("Measure cleared");
+                changed("Measure cleared");
                 return false;
             }
             if (lower.equals(".measure")) {
@@ -116,8 +116,19 @@ public final class ClientCommands {
                 return false;
             }
 
+            
+            if (lower.equals(".hud save")) {
+                ConfigIO.save();
+                log("Config saved");
+                return false;
+            }
+            if (lower.equals(".hud reload")) {
+                ConfigIO.load();
+                log("Config reloaded");
+                return false;
+            }
             if (lower.equals(".hud help")) {
-                log(".hud [crop|redstone|look|armor|coords|biome|slime|fps|count|entity|honey]");
+                log(".hud [crop|redstone|look|armor|coords|biome|slime|fps|count|entity|honey|save|reload]");
                 log(".chunk | .count radius <n> | .wp set/list/del/clear | .measure a/b/clear | .death clear");
                 return false;
             }
@@ -127,4 +138,5 @@ public final class ClientCommands {
 
     private static String on(boolean b) { return b ? "ON" : "OFF"; }
     private static void log(String s) { HudStuff.LOGGER.info(s); }
+    private static void changed(String s) { log(s); HudStuffClient.markDirty(); }
 }
