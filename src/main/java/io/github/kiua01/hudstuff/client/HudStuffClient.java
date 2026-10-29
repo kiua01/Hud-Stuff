@@ -16,8 +16,9 @@ public final class HudStuffClient implements ClientModInitializer {
         );
 
         DeathTracker.register();
+        SpeedTracker.register();
+        ClientCommands.register();
 
-        // Chunk borders: use vanilla F3+G for now (stable across 26.3 render API churn).
-        HudStuff.LOGGER.info("HUD Stuff client ready — overlay + last-death waypoint (F3+G for chunk borders)");
+        HudStuff.LOGGER.info("HUD Stuff ready — full status HUD + death + waypoint (.hud help)");
     }
 }
