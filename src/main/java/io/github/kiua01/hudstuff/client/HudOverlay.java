@@ -186,9 +186,10 @@ public final class HudOverlay {
                 HudConfig.wpDim, player, mc, c));
         }
 
-        if (HudConfig.showLookAt) {
-            String look = LookAtInfo.line(mc, player);
-            if (look != null) lines.add(new Line(look, c));
+        if (HudConfig.showLookAt || HudConfig.showCrop || HudConfig.showRedstone) {
+            for (String look : LookAtInfo.lines(mc, player)) {
+                lines.add(new Line(look, c));
+            }
         }
 
         if (HudConfig.showMeasure && (DistanceMeasure.hasA || DistanceMeasure.hasB)) {
